@@ -1,0 +1,120 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+      <!-- Header -->
+      <div class="bg-green-600 px-6 py-4 text-white">
+        <h1 class="text-2xl font-bold">My Account</h1>
+      </div>
+
+      <div class="md:flex">
+        <!-- Sidebar Navigation -->
+        <div class="w-full md:w-1/4 p-4 border-r">
+          <div class="mb-6 text-center">
+            <div class="h-16 w-16 mx-auto rounded-full bg-green-100 flex items-center justify-center text-2xl font-semibold text-green-800">
+              {{ currentUser?.name?.charAt(0).toUpperCase() }}
+            </div>
+            <h3 class="mt-2 font-medium">{{ currentUser?.name || "Guest User" }}</h3>
+            <p class="text-sm text-gray-600">{{ currentUser?.email }}</p>
+            <p class="text-xs text-gray-500">Member since {{ currentUser?.joinDate | date }}</p>
+          </div>
+
+          <nav class="space-y-2">
+            <button (click)="switchTab('profile')" class="nav-btn" [ngClass]="{'active': activeTab === 'profile'}">
+              Profile
+            </button>
+            <button (click)="switchTab('orders')" class="nav-btn" [ngClass]="{'active': activeTab === 'orders'}">
+              My Orders
+            </button>
+            <button (click)="switchTab('wishlist')" class="nav-btn" [ngClass]="{'active': activeTab === 'wishlist'}">
+              Wishlist
+            </button>
+            <button (click)="switchTab('help')" class="nav-btn" [ngClass]="{'active': activeTab === 'help'}">
+              Help Center
+            </button>
+            <button (click)="logout()" class="nav-btn text-red-600 hover:bg-red-50">
+              Logout
+            </button>
+          </nav>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="w-full md:w-3/4 p-6">
+          <!-- Loading State -->
+          <div *ngIf="isLoading" class="flex justify-center items-center h-64">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+          </div>
+
+          <!-- Profile Tab -->
+          <div *ngIf="!isLoading && activeTab === 'profile'">
+            <h2 class="text-xl font-bold mb-6">Profile Information</h2>
+            <div class="bg-gray-50 rounded-lg p-6">
+              <form (ngSubmit)="updateProfile()" #profileForm="ngForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" [(ngModel)]="editableUser.name" name="name" required
+                      class="w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500">
+                    <p class="text-xs text-gray-500 mt-1">Original: {{ originalUser.name }}</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <input type="email" [(ngModel)]="editableUser.email" name="email" required
+                      class="w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500">
+                    <p class="text-xs text-gray-500 mt-1">Original: {{ originalUser.email }}</p>
+                  </div>
+                </div>
+                <button type="submit" [disabled]="profileForm.invalid"
+                  class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
+                  Save Changes
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Orders Tab -->
+          <div *ngIf="!isLoading && activeTab === 'orders'">
+            <h2 class="text-xl font-bold mb-6">My Orders</h2>
+            <div *ngIf="orders.length === 0" class="text-center py-12">
+              <p class="text-gray-600">You haven't placed any orders yet</p>
+              <button routerLink="/products" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
+                Start Shopping
+              </button>
+            </div>
+            <div *ngIf="orders.length > 0">
+              <div *ngFor="let order of orders" class="border rounded-lg p-4 hover:shadow-md transition mb-4">
+                <p class="font-medium">Order ID: {{ order.id }}</p>
+                <p class="text-gray-500">Date: {{ order.date | date:'medium' }}</p>
+                <p class="text-gray-500">Total Price: ₹{{ order.totalPrice }}</p>
+                <ul class="list-disc pl-6 mt-2">
+                  <li *ngFor="let item of order.items">
+                    {{ item.name }} - Quantity: {{ item.quantity }} - Price: ₹{{ item.price }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wishlist Tab -->
+          <div *ngIf="!isLoading && activeTab === 'wishlist'">
+            <h2 class="text-xl font-bold mb-6">Wishlist</h2>
+            <div *ngIf="wishlist.length === 0" class="text-center py-12">
+              <p class="text-gray-600">Your wishlist is empty.</p>
+            </div>
+            <div *ngIf="wishlist.length > 0">
+              <ul class="list-disc pl-6">
+                <li *ngFor="let item of wishlist">{{ item }}</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Help Center -->
+          <div *ngIf="!isLoading && activeTab === 'help'" class="bg-gray-50 rounded-lg p-6 text-center">
+            <h2 class="text-xl font-bold mb-4">Help Center</h2>
+            <p class="text-gray-600">For support, contact us at:</p>
+            <a href="mailto:support@grocery.com" class="text-blue-500">suppor.com</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
